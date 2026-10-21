@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-LKPD Matematika - Mengenal Bangun Datar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4; /* Tailwind green-50 */
+            background-image: radial-gradient(#a7f3d0 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: #1f2937;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
+            padding: 1rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 4px solid #fff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pop { 0% { transform: scale(0.9); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-float-delayed { animation: float 3.5s ease-in-out infinite 1s; }
+        .animate-twinkle { animation: twinkle 2s infinite; }
+        .animate-pop { animation: pop 0.3s ease-out; }
+
+        /* Custom UI Elements */
+        .btn-primary {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            border-bottom: 4px solid #059669;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+            text-align: center;
+        }
+        .btn-primary:active {
+            transform: translateY(4px);
+            border-bottom-width: 0px;
+        }
+
+        .btn-option {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #374151;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #e5e7eb;
+        }
+        .btn-option:active { transform: translateY(4px); box-shadow: 0 0 0 #e5e7eb; }
+        .btn-option.selected { border-color: #3b82f6; box-shadow: 0 4px 0 #2563eb; background-color: #eff6ff; }
+        
+        .shape-mascot { position: relative; display: inline-block; }
+        .face { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
+        .eyes { display: flex; gap: 8px; margin-bottom: 2px; }
+        .eye { width: 8px; height: 8px; background: #374151; border-radius: 50%; }
+        .smile { width: 16px; height: 8px; border-bottom: 3px solid #374151; border-radius: 0 0 16px 16px; }
+
+        /* Progress Bar */
+        .progress-container { width: 100%; background: #e5e7eb; border-radius: 999px; height: 12px; overflow: hidden; margin-top: 8px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #fcd34d, #f59e0b); width: 0%; transition: width 0.5s ease; }
+
+        /* Scene Backgrounds */
+        .bg-islamic {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 30vh; z-index: -1;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200' preserveAspectRatio='none'%3E%3Cpath d='M0,200 L0,150 Q50,120 100,150 T200,150 T300,150 T400,150 T500,150 T600,150 T700,150 T800,150 T900,150 T1000,150 L1000,200 Z' fill='%23d1fae5'/%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: bottom;
+            opacity: 0.5;
+        }
+
+        /* Grouping Dropzones */
+        .dropzone { border: 3px dashed #9ca3af; border-radius: 1rem; padding: 1rem; min-height: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: all 0.2s; }
+        .dropzone.highlight { border-color: #10b981; background-color: #d1fae5; }
+        .draggable-item { cursor: pointer; transition: transform 0.2s; }
+        .draggable-item.selected { transform: scale(1.1); box-shadow: 0 0 0 4px #3b82f6; border-radius: 50%; }
+
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative">
+
+    <!-- Background Decor -->
+    <div class="fixed top-4 left-4 text-4xl text-yellow-300 animate-twinkle z-0">✨</div>
+    <div class="fixed top-12 right-10 text-3xl text-yellow-300 animate-twinkle z-0" style="animation-delay: 1s;">✨</div>
+    <div class="fixed top-20 left-1/4 text-5xl opacity-40 animate-float z-0">☁️</div>
+    <div class="fixed top-10 right-1/4 text-4xl opacity-50 animate-float-delayed z-0">☁️</div>
+    <div class="bg-islamic"></div>
+
+    <!-- Audio Toggle -->
+    <button id="btn-audio" class="fixed top-4 right-4 z-50 bg-white p-3 rounded-full shadow-lg border-2 border-green-200 text-2xl" onclick="toggleAudio()">
+        🔊
+    </button>
+
+    <!-- UI Overlay for Questions (Progress & Header) -->
+    <div id="quiz-header" class="hidden fixed top-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-sm shadow-sm z-40">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center text-sm font-bold text-gray-600 mb-2">
+                <span id="quiz-section-title">Bagian 1: Petualangan</span>
+                <span id="quiz-progress-text">Soal 1 dari 10</span>
+            </div>
+            <div class="progress-container">
+                <div id="quiz-progress-bar" class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app-container" class="w-full max-w-2xl mx-auto relative z-10 flex-grow flex flex-col">
+
+        <!-- SCREEN 0: WELCOME -->
+        <section id="screen-welcome" class="screen active">
+            <div class="text-center mb-6 animate-pop">
+                <!-- Mosque Logo -->
+                <svg class="w-32 h-32 mx-auto mb-4 text-emerald-500" viewBox="0 0 100 100" fill="currentColor">
+                    <path d="M50 10 L60 30 L80 30 L80 90 L20 90 L20 30 L40 30 Z" />
+                    <circle cx="50" cy="20" r="8" fill="#fde047" />
+                    <path d="M40 90 L40 60 C40 50, 60 50, 60 60 L60 90 Z" fill="white" />
+                </svg>
+                <h1 class="text-4xl md:text-5xl font-black text-emerald-600 mb-2 drop-shadow-sm leading-tight">AYO, KENALI<br>BANGUN DATAR!</h1>
+                <p class="text-lg text-gray-600 font-semibold bg-white inline-block px-4 py-1 rounded-full shadow-sm">"Belajar Matematika Jadi Seru Bersama Bunda Ara!"</p>
+            </div>
+
+            <!-- Mascot Shapes -->
+            <div class="flex justify-center gap-4 mb-8">
+                <div class="shape-mascot animate-float">
+                    <svg width="60" height="60" viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="#fde047"/></svg>
+                    <div class="face"><div class="eyes"><div class="eye"></div><div class="eye"></div></div><div class="smile"></div></div>
+                </div>
+                <div class="shape-mascot animate-float-delayed">
+                    <svg width="60" height="60" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="10" fill="#6ee7b7"/></svg>
+                    <div class="face"><div class="eyes"><div class="eye"></div><div class="eye"></div></div><div class="smile"></div></div>
+                </div>
+                <div class="shape-mascot animate-float" style="animation-delay: 0.5s;">
+                    <svg width="60" height="60" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#7dd3fc"/></svg>
+                    <div class="face"><div class="eyes"><div class="eye"></div><div class="eye"></div></div><div class="smile"></div></div>
+                </div>
+            </div>
+
+            <div class="card p-6 w-full max-w-sm mb-6 text-center">
+                <p class="text-sm font-semibold text-gray-700 mb-4">Assalamu’alaikum, Anak Hebat Kelas 1B! Yuk, kita bermain sambil belajar. Tulis namamu dulu ya!</p>
+                <div class="mb-4 text-left">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Nama Panggilan:</label>
+                    <input type="text" id="student-name" placeholder="Contoh: Ali" class="w-full border-2 border-emerald-200 rounded-xl p-3 text-lg font-bold text-center focus:outline-none focus:border-emerald-500 bg-gray-50">
+                </div>
+                <div class="mb-4 text-left">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Kelas:</label>
+                    <input type="text" value="1B SDIT Az-Zahra" disabled class="w-full border-2 border-gray-200 rounded-xl p-3 text-lg font-bold text-center bg-gray-100 text-gray-500">
+                </div>
+                <button onclick="startMaterial()" class="btn-primary w-full mt-2 flex items-center justify-center gap-2">
+                    MULAI BELAJAR 🚀
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 1: MATERIAL -->
+        <section id="screen-material" class="screen hidden">
+            <h2 class="text-3xl font-black text-emerald-600 mb-6 text-center bg-white py-2 px-6 rounded-full shadow-sm">Mengenal Bangun Datar</h2>
+            
+            <div class="flex flex-col gap-4 w-full max-w-md mb-8">
+                <!-- Segitiga -->
+                <div class="card p-4 flex items-center gap-4 border-l-8 border-l-yellow-400">
+                    <div class="w-20 h-20 flex-shrink-0 relative">
+                        <svg viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="#fde047" stroke="#ca8a04" stroke-width="4"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Segitiga</h3>
+                        <p class="text-sm text-gray-600">Punya <b>3 sisi</b> dan <b>3 titik sudut</b>.<br>Contoh: Rambu jalan ⚠️, Potongan pizza 🍕</p>
+                    </div>
+                </div>
+
+                <!-- Segiempat -->
+                <div class="card p-4 flex items-center gap-4 border-l-8 border-l-emerald-400">
+                    <div class="w-20 h-20 flex-shrink-0">
+                        <svg viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="5" fill="#6ee7b7" stroke="#059669" stroke-width="4"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Segiempat (Persegi)</h3>
+                        <p class="text-sm text-gray-600">Punya <b>4 sisi</b> dan <b>4 titik sudut</b>.<br>Contoh: Ubin lantai 🟩, Buku 📖</p>
+                    </div>
+                </div>
+
+                <!-- Lingkaran -->
+                <div class="card p-4 flex items-center gap-4 border-l-8 border-l-sky-400">
+                    <div class="w-20 h-20 flex-shrink-0">
+                        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#7dd3fc" stroke="#0284c7" stroke-width="4"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Lingkaran</h3>
+                        <p class="text-sm text-gray-600">Bentuknya <b>bulat</b>, tidak punya sudut.<br>Contoh: Jam dinding 🕐, Roda 🛞</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startQuiz()" class="btn-primary flex items-center gap-2">
+                AKU SIAP BERMAIN! 🎮
+            </button>
+        </section>
+
+        <!-- SCREEN: Q1 -->
+        <section id="q1" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Manakah yang berbentuk segitiga?')">🔊 Dengarkan</button>
+            <h2 class="text-2xl font-bold text-center mb-8">Manakah yang berbentuk segitiga?</h2>
+            <div class="flex justify-center gap-6 flex-wrap">
+                <button class="btn-option p-6 rounded-2xl" onclick="submitAnswer(1, 'Lingkaran', false, 'Belum tepat. Gambar ini adalah lingkaran, bentuknya bulat.', this)">
+                    <svg width="80" height="80" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#7dd3fc"/></svg>
+                </button>
+                <button class="btn-option p-6 rounded-2xl" onclick="submitAnswer(1, 'Segitiga', true, 'MasyaAllah, jawabanmu benar! Ini adalah segitiga.', this)">
+                    <svg width="80" height="80" viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="#fde047"/></svg>
+                </button>
+                <button class="btn-option p-6 rounded-2xl" onclick="submitAnswer(1, 'Segiempat', false, 'Belum tepat. Gambar ini adalah segiempat.', this)">
+                    <svg width="80" height="80" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="5" fill="#6ee7b7"/></svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q2 -->
+        <section id="q2" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Ada berapa titik sudut pada bangun ini?')">🔊 Dengarkan</button>
+            <div class="w-32 h-32 mx-auto mb-6">
+                <svg viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="#6ee7b7" stroke="#059669" stroke-width="4"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-center mb-8">Ada berapa titik sudut pada bangun ini?</h2>
+            <div class="flex gap-4 justify-center">
+                <button class="btn-option w-20 h-20 text-3xl" onclick="submitAnswer(2, '2', false, 'Kurang tepat. Segitiga memiliki lebih dari 2 sudut.', this)">2</button>
+                <button class="btn-option w-20 h-20 text-3xl" onclick="submitAnswer(2, '3', true, 'Hebat! Segitiga memiliki 3 titik sudut.', this)">3</button>
+                <button class="btn-option w-20 h-20 text-3xl" onclick="submitAnswer(2, '4', false, 'Kurang tepat. Segiempat lah yang memiliki 4 sudut.', this)">4</button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q3 -->
+        <section id="q3" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Benda manakah yang berbentuk lingkaran?')">🔊 Dengarkan</button>
+            <h2 class="text-2xl font-bold text-center mb-8">Benda manakah yang berbentuk lingkaran?</h2>
+            <div class="flex justify-center gap-6">
+                <button class="btn-option p-4 flex flex-col items-center gap-2" onclick="submitAnswer(3, 'Roda', true, 'Benar sekali! Roda berbentuk lingkaran.', this)">
+                    <span class="text-6xl">🛞</span>
+                    <span class="text-sm font-bold">Roda</span>
+                </button>
+                <button class="btn-option p-4 flex flex-col items-center gap-2" onclick="submitAnswer(3, 'Buku', false, 'Belum tepat. Buku berbentuk segiempat (persegi panjang).', this)">
+                    <span class="text-6xl">📖</span>
+                    <span class="text-sm font-bold">Buku</span>
+                </button>
+                <button class="btn-option p-4 flex flex-col items-center gap-2" onclick="submitAnswer(3, 'Rambu', false, 'Belum tepat. Rambu ini berbentuk segitiga.', this)">
+                    <span class="text-6xl">⚠️</span>
+                    <span class="text-sm font-bold">Rambu</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q4 -->
+        <section id="q4" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-2 shadow-sm" onclick="speak('Pasangkan ubin ini dengan bentuk bayangan yang sesuai!')">🔊 Dengarkan</button>
+            <div class="flex flex-col items-center mb-6">
+                <span class="text-6xl mb-2">🟩</span>
+                <p class="font-bold text-gray-600">Ubin</p>
+            </div>
+            <h2 class="text-xl font-bold text-center mb-6">Pasangkan ubin ini dengan bentuk yang sesuai!</h2>
+            <div class="flex justify-center gap-6">
+                <button class="btn-option p-4" onclick="submitAnswer(4, 'Siluet Lingkaran', false, 'Belum tepat. Ubin memiliki sudut, sedangkan lingkaran tidak.', this)">
+                    <svg width="60" height="60" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#374151"/></svg>
+                </button>
+                <button class="btn-option p-4" onclick="submitAnswer(4, 'Siluet Segitiga', false, 'Belum tepat. Ubin memiliki 4 sisi, bukan 3.', this)">
+                    <svg width="60" height="60" viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="#374151"/></svg>
+                </button>
+                <button class="btn-option p-4" onclick="submitAnswer(4, 'Siluet Segiempat', true, 'Luar biasa! Ubin berbentuk segiempat (persegi).', this)">
+                    <svg width="60" height="60" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" fill="#374151"/></svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q5 -->
+        <section id="q5" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Aku mempunyai 4 sisi dan 4 titik sudut. Aku berbentuk persegi. Siapakah aku?')">🔊 Dengarkan</button>
+            <div class="card p-6 bg-yellow-50 border-yellow-200 mb-6 max-w-sm mx-auto text-center relative">
+                <span class="text-4xl absolute -top-5 -left-2 rotate-12">🤔</span>
+                <p class="text-lg font-bold text-gray-800 italic">"Aku mempunyai 4 sisi dan 4 titik sudut. Aku berbentuk persegi. Siapakah aku?"</p>
+            </div>
+            <div class="flex flex-col gap-3 w-full max-w-xs mx-auto">
+                <button class="btn-option w-full" onclick="submitAnswer(5, 'Segitiga', false, 'Belum tepat. Segitiga hanya punya 3 sisi.', this)">Segitiga</button>
+                <button class="btn-option w-full" onclick="submitAnswer(5, 'Segiempat', true, 'Tepat sekali! Segiempat (persegi) memiliki 4 sisi.', this)">Segiempat / Persegi</button>
+                <button class="btn-option w-full" onclick="submitAnswer(5, 'Lingkaran', false, 'Belum tepat. Lingkaran tidak punya sudut sama sekali.', this)">Lingkaran</button>
+            </div>
+        </section>
+
+        <!-- SCREEN: TRANSITION -->
+        <section id="screen-transition" class="screen hidden">
+            <div class="text-center animate-pop">
+                <div class="text-7xl mb-4">🌟👦🏻👧🏻🌟</div>
+                <h2 class="text-3xl font-black text-emerald-600 mb-4">MasyaAllah!</h2>
+                <p class="text-lg font-bold text-gray-700 mb-8 max-w-sm bg-white p-4 rounded-xl shadow-sm">Kamu sudah menyelesaikan Petualangan Pertama! Sekarang, yuk lanjut ke tantangan berikutnya di Kota Mini!</p>
+                <button onclick="nextQuestion()" class="btn-primary">LANJUT KE BAGIAN 2 🏙️</button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q6 -->
+        <section id="q6" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Ketuk benda yang berbentuk lingkaran!')">🔊 Dengarkan</button>
+            <h2 class="text-2xl font-bold text-center mb-6">Ketuk benda yang berbentuk lingkaran!</h2>
+            <div class="card p-8 bg-blue-50 relative max-w-md mx-auto w-full h-64 rounded-3xl border-blue-200 shadow-inner flex justify-around items-center">
+                <!-- Room scene -->
+                <button class="text-6xl hover:scale-110 transition-transform btn-scene-item" onclick="submitAnswer(6, 'Jam Dinding', true, 'Benar! Jam dinding bentuknya lingkaran.', this)">🕐</button>
+                <button class="text-6xl hover:scale-110 transition-transform btn-scene-item" onclick="submitAnswer(6, 'Buku', false, 'Itu buku, bentuknya segiempat.', this)">📘</button>
+                <button class="text-6xl hover:scale-110 transition-transform btn-scene-item" onclick="submitAnswer(6, 'Hiasan Segitiga', false, 'Itu hiasan bendera, bentuknya segitiga.', this)">🚩</button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q7 -->
+        <section id="q7" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Benar atau Tidak? Segitiga memiliki 3 sisi.')">🔊 Dengarkan</button>
+            <div class="w-32 h-32 mx-auto mb-4">
+                <svg viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="#fde047" stroke="#ca8a04" stroke-width="4"/></svg>
+            </div>
+            <div class="card p-4 bg-white mb-6 text-center border-2 border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800">"Segitiga memiliki 3 sisi."</h2>
+            </div>
+            <div class="flex justify-center gap-4 w-full max-w-xs mx-auto">
+                <button class="btn-option flex-1 bg-green-50 text-green-700 border-green-300" onclick="submitAnswer(7, 'Benar', true, 'MasyaAllah benar! Segitiga memang memiliki 3 sisi.', this)">✅ BENAR</button>
+                <button class="btn-option flex-1 bg-red-50 text-red-700 border-red-300" onclick="submitAnswer(7, 'Tidak Benar', false, 'Pernyataan tadi benar lho. Coba hitung lagi, segitiga pasti punya 3 sisi.', this)">❌ TIDAK</button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q8 (Grouping Logic) -->
+        <section id="q8" class="screen hidden pt-20 pb-10">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-2 shadow-sm mx-auto block" onclick="speak('Pilih gambar benda di bawah, lalu ketuk wadah yang tepat!')">🔊 Instruksi</button>
+            <h2 class="text-lg font-bold text-center mb-4">Kelompokkan Bangun Datar! (Pilih benda, lalu pilih wadah)</h2>
+            
+            <!-- Containers -->
+            <div class="grid grid-cols-3 gap-2 w-full max-w-md mx-auto mb-6">
+                <button class="dropzone bg-yellow-50" onclick="handleDrop('segitiga')">
+                    <span class="font-bold text-sm text-yellow-700">Segitiga</span>
+                    <span class="text-xs text-yellow-600 mt-1" id="count-segitiga">0/2</span>
+                </button>
+                <button class="dropzone bg-green-50" onclick="handleDrop('segiempat')">
+                    <span class="font-bold text-sm text-green-700">Segiempat</span>
+                    <span class="text-xs text-green-600 mt-1" id="count-segiempat">0/2</span>
+                </button>
+                <button class="dropzone bg-blue-50" onclick="handleDrop('lingkaran')">
+                    <span class="font-bold text-sm text-blue-700">Lingkaran</span>
+                    <span class="text-xs text-blue-600 mt-1" id="count-lingkaran">0/2</span>
+                </button>
+            </div>
+
+            <!-- Items -->
+            <div class="flex flex-wrap justify-center gap-4 w-full max-w-md mx-auto p-4 bg-white rounded-xl shadow-sm border" id="q8-items">
+                <div class="draggable-item text-4xl p-2" onclick="selectItem(this, 'lingkaran', 'Roda')" id="item1">🛞</div>
+                <div class="draggable-item text-4xl p-2" onclick="selectItem(this, 'segiempat', 'Ubin')" id="item2">🟩</div>
+                <div class="draggable-item text-4xl p-2" onclick="selectItem(this, 'segitiga', 'Rambu')" id="item3">⚠️</div>
+                <div class="draggable-item text-4xl p-2" onclick="selectItem(this, 'lingkaran', 'Jam')" id="item4">🕐</div>
+                <div class="draggable-item text-4xl p-2" onclick="selectItem(this, 'segiempat', 'Buku')" id="item5">📘</div>
+                <div class="draggable-item text-4xl p-2" onclick="selectItem(this, 'segitiga', 'Hiasan')" id="item6">🚩</div>
+            </div>
+            <p id="q8-msg" class="text-center text-sm font-bold text-blue-500 mt-4 h-6">Silakan ketuk salah satu benda...</p>
+        </section>
+
+        <!-- SCREEN: Q9 -->
+        <section id="q9" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Lengkapi polanya! Lingkaran, Segitiga, Lingkaran, Segitiga... selanjutnya apa?')">🔊 Dengarkan</button>
+            <h2 class="text-2xl font-bold text-center mb-6">Lengkapi Polanya!</h2>
+            <div class="flex justify-center items-center gap-4 mb-8 bg-white p-4 rounded-full shadow-sm max-w-md mx-auto">
+                <span class="text-4xl text-blue-400">🔴</span>
+                <span class="text-4xl text-yellow-400">🔺</span>
+                <span class="text-4xl text-blue-400">🔴</span>
+                <span class="text-4xl text-yellow-400">🔺</span>
+                <span class="text-4xl border-b-4 border-dashed border-gray-400 w-12 text-center pb-1">❓</span>
+            </div>
+            <div class="flex justify-center gap-6">
+                <button class="btn-option p-4 text-4xl" onclick="submitAnswer(9, 'Lingkaran', true, 'Pintar! Polanya bergantian, jadi setelah segitiga adalah lingkaran.', this)">🔴</button>
+                <button class="btn-option p-4 text-4xl" onclick="submitAnswer(9, 'Segitiga', false, 'Belum tepat. Coba perhatikan urutannya.', this)">🔺</button>
+                <button class="btn-option p-4 text-4xl" onclick="submitAnswer(9, 'Segiempat', false, 'Belum tepat. Pola ini hanya memakai dua bentuk.', this)">🟩</button>
+            </div>
+        </section>
+
+        <!-- SCREEN: Q10 -->
+        <section id="q10" class="screen hidden pt-20">
+            <button class="bg-blue-100 text-blue-700 p-2 rounded-full mb-4 shadow-sm" onclick="speak('Perhatikan gambar masjid ini. Bangun datar manakah yang memiliki 4 sisi?')">🔊 Dengarkan</button>
+            
+            <div class="w-48 h-48 mx-auto mb-6 relative">
+                <!-- Mosque illustration composite -->
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <!-- Dome -->
+                    <path d="M20 50 Q50 10 80 50 Z" fill="#34d399" />
+                    <!-- Building -->
+                    <rect x="20" y="50" width="60" height="40" fill="#fde047" />
+                    <!-- Window (Square) -->
+                    <rect x="40" y="60" width="20" height="20" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2" />
+                    <!-- Clock on Dome -->
+                    <circle cx="50" cy="40" r="6" fill="white" stroke="#374151" stroke-width="1" />
+                    <!-- Flag/Ornament -->
+                    <polygon points="50,10 55,20 45,20" fill="#f87171" />
+                </svg>
+            </div>
+
+            <h2 class="text-xl font-bold text-center mb-6">Bangun datar manakah yang memiliki 4 sisi?</h2>
+            <div class="flex flex-col gap-3 w-full max-w-xs mx-auto">
+                <button class="btn-option w-full" onclick="submitAnswer(10, 'Jendela (Segiempat)', true, 'Luar biasa! Jendela masjid bentuknya segiempat dan punya 4 sisi.', this)">Jendela (Segiempat)</button>
+                <button class="btn-option w-full" onclick="submitAnswer(10, 'Jam (Lingkaran)', false, 'Kurang tepat. Lingkaran tidak punya sisi lurus.', this)">Jam (Lingkaran)</button>
+                <button class="btn-option w-full" onclick="submitAnswer(10, 'Hiasan (Segitiga)', false, 'Kurang tepat. Segitiga hanya punya 3 sisi.', this)">Hiasan Atap (Segitiga)</button>
+            </div>
+        </section>
+
+        <!-- SCREEN: RESULT -->
+        <section id="screen-result" class="screen hidden py-10">
+            <div class="card p-6 w-full max-w-md text-center">
+                <div class="text-6xl mb-2">🎉</div>
+                <h1 class="text-2xl font-black text-emerald-600 mb-1">ALHAMDULILLAH,</h1>
+                <h2 class="text-xl font-bold text-emerald-800 mb-6">MISIMU SELESAI!</h2>
+
+                <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-200">
+                    <p class="font-bold text-lg text-gray-800" id="res-name">Nama: -</p>
+                    <p class="text-sm text-gray-600 font-semibold mb-4">Kelas 1B SDIT Az-Zahra</p>
+                    
+                    <div class="flex justify-center items-center gap-4 mb-4">
+                        <div class="text-center">
+                            <p class="text-3xl font-black text-emerald-500" id="res-correct">0</p>
+                            <p class="text-xs font-bold text-gray-500">BENAR</p>
+                        </div>
+                        <div class="w-px h-10 bg-gray-300"></div>
+                        <div class="text-center">
+                            <p class="text-3xl font-black text-red-500" id="res-wrong">0</p>
+                            <p class="text-xs font-bold text-gray-500">SALAH</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-3 shadow-inner">
+                        <p class="text-sm font-bold text-gray-500">NILAI AKHIR</p>
+                        <p class="text-5xl font-black text-emerald-600" id="res-score">100</p>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 rounded-xl p-4 mb-6 border border-yellow-200">
+                    <p class="text-sm font-bold text-yellow-800" id="res-message">Pesan penyemangat...</p>
+                </div>
+
+                <button onclick="sendToWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 text-lg">
+                    <span>KIRIM KE BUNDA ARA</span>
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center transform scale-95 transition-transform duration-300" id="feedback-content">
+            <div id="fb-icon" class="text-6xl mb-4">⭐</div>
+            <h3 id="fb-title" class="text-2xl font-black mb-2">Benar!</h3>
+            <p id="fb-message" class="text-gray-600 font-bold mb-6">Penjelasan di sini.</p>
+            <button onclick="nextQuestion()" class="btn-primary w-full shadow-md">LANJUT</button>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            studentName: '',
+            currentScreen: 0, // 0: welcome, 1: material, 2-6: Q1-Q5, 7: transition, 8-12: Q6-Q10, 13: result
+            score: 0,
+            answers: [], // {q: 1, userAnswer: '...', isCorrect: true}
+            soundEnabled: true,
+            q8State: { correct: 0, items: 6, sorted: 0, failed: false }
+        };
+
+        const totalQuestions = 10;
+        const screens = [
+            'screen-welcome', 'screen-material', 
+            'q1', 'q2', 'q3', 'q4', 'q5', 
+            'screen-transition', 
+            'q6', 'q7', 'q8', 'q9', 'q10', 
+            'screen-result'
+        ];
+
+        // Audio Management
+        function toggleAudio() {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById('btn-audio').innerText = state.soundEnabled ? '🔊' : '🔇';
+            if(state.soundEnabled) speak("Suara diaktifkan");
+        }
+
+        function speak(text) {
+            if (!state.soundEnabled) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'id-ID';
+                msg.rate = 0.9;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        // Navigation
+        function showScreen(index) {
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('active');
+            });
+            const nextEl = document.getElementById(screens[index]);
+            if(nextEl) nextEl.classList.add('active');
+            
+            // Manage Header visibility
+            const header = document.getElementById('quiz-header');
+            if (index >= 2 && index <= 12 && index !== 7) {
+                header.classList.remove('hidden');
+                updateProgress(index);
+            } else {
+                header.classList.add('hidden');
+            }
+
+            state.currentScreen = index;
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress(index) {
+            let qNumber = index >= 8 ? index - 2 : index - 1; // Adjust for material & transition
+            document.getElementById('quiz-section-title').innerText = qNumber <= 5 ? 'Bagian 1: Petualangan' : 'Bagian 2: Kota Mini';
+            document.getElementById('quiz-progress-text').innerText = `Soal ${qNumber} dari 10`;
+            document.getElementById('quiz-progress-bar').style.width = `${(qNumber / 10) * 100}%`;
+        }
+
+        function startMaterial() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            if(!nameInput) {
+                alert("Tulis namamu dulu ya, Anak Hebat!"); // Native alert fallback just in case, but keeping UI clean.
+                return;
+            }
+            state.studentName = nameInput;
+            showScreen(1);
+            speak("Mengenal Bangun Datar. Segitiga, Segiempat, dan Lingkaran.");
+        }
+
+        function startQuiz() {
+            showScreen(2); // Goes to Q1
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            
+            if(state.currentScreen === 6) {
+                // After Q5 go to transition
+                showScreen(7);
+                speak("MasyaAllah, kamu sudah menyelesaikan Petualangan Pertama!");
+            } else if (state.currentScreen === 12) {
+                // After Q10 go to result
+                generateResult();
+                showScreen(13);
+            } else {
+                showScreen(state.currentScreen + 1);
+            }
+        }
+
+        function submitAnswer(qNumber, answer, isCorrect, explanation, btnElement) {
+            // Prevent double submission
+            if(state.answers.some(a => a.q === qNumber)) return;
+
+            // Record Answer
+            state.answers.push({ q: qNumber, userAnswer: answer, isCorrect: isCorrect, status: isCorrect ? 'Benar' : 'Salah' });
+            if (isCorrect) state.score += 10;
+
+            // UI styling for button
+            if (btnElement) {
+                btnElement.classList.add('selected');
+                const parent = btnElement.parentElement;
+                Array.from(parent.children).forEach(child => {
+                    if(child.tagName === 'BUTTON') child.disabled = true;
+                });
+            }
+
+            showFeedback(isCorrect, explanation);
+        }
+
+        function showFeedback(isCorrect, text) {
+            const modal = document.getElementById('feedback-modal');
+            const content = document.getElementById('feedback-content');
+            const icon = document.getElementById('fb-icon');
+            const title = document.getElementById('fb-title');
+            const msg = document.getElementById('fb-message');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => content.classList.add('scale-100'), 10);
+            
+            if (isCorrect) {
+                icon.innerText = '🌟';
+                title.innerText = 'MasyaAllah Benar!';
+                title.className = 'text-2xl font-black mb-2 text-emerald-500';
+                speak("Jawabanmu Benar! " + text);
+                createConfetti();
+            } else {
+                icon.innerText = '💡';
+                title.innerText = 'Belum Tepat, Ya';
+                title.className = 'text-2xl font-black mb-2 text-orange-500';
+                speak("Belum tepat. " + text);
+            }
+            msg.innerText = text;
+        }
+
+        // --- Q8 Logic (Grouping) ---
+        let selectedItemForQ8 = null;
+
+        function selectItem(el, type, name) {
+            if(state.answers.some(a => a.q === 8) || state.q8State.failed) return; // locked
+            if (el.classList.contains('opacity-0')) return; // already sorted
+
+            // Deselect previous
+            document.querySelectorAll('.draggable-item').forEach(i => i.classList.remove('selected', 'ring-4', 'ring-blue-400'));
+            
+            el.classList.add('selected', 'ring-4', 'ring-blue-400');
+            selectedItemForQ8 = { el, type, name };
+            document.getElementById('q8-msg').innerText = `Pilih wadah untuk ${name}...`;
+        }
+
+        function handleDrop(containerType) {
+            if (!selectedItemForQ8) return;
+            if(state.answers.some(a => a.q === 8) || state.q8State.failed) return;
+
+            const { el, type, name } = selectedItemForQ8;
+            
+            if (type === containerType) {
+                // Correct match
+                el.classList.remove('selected');
+                el.classList.add('opacity-0', 'pointer-events-none', 'scale-50');
+                state.q8State.sorted++;
+                
+                // Update count text
+                let countEl = document.getElementById(`count-${containerType}`);
+                let current = parseInt(countEl.innerText.split('/')[0]);
+                countEl.innerText = `${current + 1}/2`;
+
+                document.getElementById('q8-msg').innerText = `Hebat! ${name} masuk wadah ${containerType}.`;
+                selectedItemForQ8 = null;
+
+                if (state.q8State.sorted === state.q8State.items) {
+                    // All sorted correctly
+                    submitAnswer(8, 'Berhasil mengelompokkan semua', true, 'Kamu berhasil mengelompokkan semua benda dengan tepat!', null);
+                } else {
+                    speak("Benar.");
+                }
+            } else {
+                // Wrong match - fail the question immediately as per prompt single attempt rule
+                state.q8State.failed = true;
+                submitAnswer(8, `Gagal di ${name}`, false, `${name} seharusnya masuk ke wadah ${type}, bukan ${containerType}.`, null);
+            }
+        }
+
+        function createConfetti() {
+            for(let i=0; i<30; i++) {
+                const conf = document.createElement('div');
+                conf.innerText = ['✨','🎉','⭐'][Math.floor(Math.random()*3)];
+                conf.style.position = 'fixed';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.top = '-5vh';
+                conf.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                conf.style.zIndex = '9999';
+                conf.style.transition = 'all 2s ease-in';
+                document.body.appendChild(conf);
+                
+                setTimeout(() => {
+                    conf.style.top = '100vh';
+                    conf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                }, 50);
+                setTimeout(() => conf.remove(), 2000);
+            }
+        }
+
+        function generateResult() {
+            document.getElementById('res-name').innerText = `Nama: ${state.studentName}`;
+            const correctCount = state.answers.filter(a => a.isCorrect).length;
+            const wrongCount = totalQuestions - correctCount;
+            
+            document.getElementById('res-correct').innerText = correctCount;
+            document.getElementById('res-wrong').innerText = wrongCount;
+            document.getElementById('res-score').innerText = state.score;
+
+            let msg = "";
+            if (state.score >= 90) msg = "MasyaAllah, luar biasa! Kamu sudah mengenal bangun datar dengan sangat baik.";
+            else if (state.score >= 70) msg = "Alhamdulillah, kamu sudah berusaha dengan baik. Terus semangat belajar!";
+            else if (state.score >= 50) msg = "Bagus, kamu sudah menyelesaikan tantangan. Yuk, pelajari kembali bentuk-bentuk bangun datar.";
+            else msg = "Terima kasih sudah berusaha sampai selesai. Jangan menyerah, ya. Belajar sedikit demi sedikit akan membuatmu semakin hebat!";
+            
+            document.getElementById('res-message').innerText = msg;
+            speak("Alhamdulillah misi selesai. " + msg);
+        }
+
+        function sendToWhatsApp() {
+            const correctCount = state.answers.filter(a => a.isCorrect).length;
+            const wrongCount = totalQuestions - correctCount;
+            
+            // Sort answers to display in order 1-10
+            const sortedAnswers = [...state.answers].sort((a,b) => a.q - b.q);
+            
+            let rincian = sortedAnswers.map(a => `${a.q}. [${a.status}] - Jawaban: ${a.userAnswer}`).join('\n');
+
+            const text = `Assalamu’alaikum, Bunda Ara.
+Berikut hasil E-LKPD Matematika ananda:
+
+Nama: ${state.studentName}
+Kelas: 1B SDIT Az-Zahra
+Materi: Mengenal Bangun Datar
+Jumlah soal: 10
+Jawaban benar: ${correctCount}
+Jawaban salah: ${wrongCount}
+Nilai akhir: ${state.score}/100
+
+Rincian jawaban:
+${rincian}
+
+Terima kasih, Bunda Ara.`;
+
+            const encodedText = encodeURIComponent(text);
+            const waUrl = `https://wa.me/6281349582525?text=${encodedText}`;
+            window.open(waUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
